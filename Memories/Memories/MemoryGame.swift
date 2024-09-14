@@ -20,7 +20,7 @@ struct MemoryGame<CardContent> where CardContent:Equatable {
         }
     }
     
-    var indexOfOneAndOnlyFaceUpCard: Int? {
+   private var indexOfOneAndOnlyFaceUpCard: Int? {
         get { return cards.indices.filter{ cards[$0].isFaceUp }.only }
         set { cards.indices.forEach { cards[$0].isFaceUp = (newValue == $0) } }
     }

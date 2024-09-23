@@ -17,6 +17,7 @@
 		7044D9D52C95B97C00019647 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7044D9D42C95B97C00019647 /* CardView.swift */; };
 		7044D9D72C95D3A900019647 /* Pie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7044D9D62C95D3A900019647 /* Pie.swift */; };
 		7044D9D92C95D97E00019647 /* Cardify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7044D9D82C95D97E00019647 /* Cardify.swift */; };
+		7044D9DB2CA155B100019647 /* FlyingNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7044D9DA2CA155B100019647 /* FlyingNumber.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		7044D9D42C95B97C00019647 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		7044D9D62C95D3A900019647 /* Pie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pie.swift; sourceTree = "<group>"; };
 		7044D9D82C95D97E00019647 /* Cardify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cardify.swift; sourceTree = "<group>"; };
+		7044D9DA2CA155B100019647 /* FlyingNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyingNumber.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,10 +67,11 @@
 			children = (
 				7044D9C02C90235A00019647 /* MemoriesApp.swift */,
 				7044D9C22C90235A00019647 /* EmojiMemoryGameView.swift */,
+				7044D9DA2CA155B100019647 /* FlyingNumber.swift */,
+				7044D9D22C95675400019647 /* AspectVGrid.swift */,
 				7044D9D42C95B97C00019647 /* CardView.swift */,
 				7044D9D82C95D97E00019647 /* Cardify.swift */,
 				7044D9D62C95D3A900019647 /* Pie.swift */,
-				7044D9D22C95675400019647 /* AspectVGrid.swift */,
 				7044D9CE2C92F06D00019647 /* MemoryGame.swift */,
 				7044D9D02C92F26600019647 /* EmojiMemoryGame.swift */,
 				7044D9C42C90235A00019647 /* Assets.xcassets */,
@@ -157,6 +160,7 @@
 			files = (
 				7044D9D32C95675400019647 /* AspectVGrid.swift in Sources */,
 				7044D9CF2C92F06D00019647 /* MemoryGame.swift in Sources */,
+				7044D9DB2CA155B100019647 /* FlyingNumber.swift in Sources */,
 				7044D9D92C95D97E00019647 /* Cardify.swift in Sources */,
 				7044D9C32C90235A00019647 /* EmojiMemoryGameView.swift in Sources */,
 				7044D9C12C90235A00019647 /* MemoriesApp.swift in Sources */,

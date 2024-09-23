@@ -7,12 +7,14 @@
 
 import SwiftUI
 
+// viewModel
+
 class EmojiMemoryGame: ObservableObject {
     typealias Card = MemoryGame<String>.Card
     private static let emojis = ["👻","🎃","🤠", "😈","👹","🤡","☠️","🍧","🍳","🥞","🍲"]
     
     private static func createMemoryGame() -> MemoryGame<String> {
-        return MemoryGame(numberOfPairsOfCards: 2) { pariIndex in
+        return MemoryGame(numberOfPairsOfCards: 4  ) { pariIndex in
             if emojis.indices.contains(pariIndex) {
                 return emojis[pariIndex]
             } else {
@@ -29,6 +31,10 @@ class EmojiMemoryGame: ObservableObject {
     
     var color: Color {
         .orange
+    }
+    
+    var score: Int {
+        model.score
     }
     
     // MARK: - Intents

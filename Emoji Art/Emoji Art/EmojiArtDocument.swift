@@ -10,11 +10,33 @@ import SwiftUI
 class EmojiArtDocument: ObservableObject {
     typealias Emoji = EmojiArt.Emoji
     
-    @Published private var emojiArt = EmojiArt()
+    @Published private var emojiArt = EmojiArt(){
+        didSet {
+            autoSave()
+        }
+    }
     
-    init(){
-        emojiArt.addEmoji("🚗", at: .init(x: -200, y: -150), size: 200)
-        emojiArt.addEmoji("🧸", at: .init(x: 250, y: 100), size: 80)
+    private var autoSaveURL: URL = URL.documentsDirectory.appendingPathComponent("AutoSaved.emojiart")
+    
+    private func autoSave() {
+        save(to: autoSaveURL)
+        print(autoSaveURL)
+    }
+    
+    private func save(to url: URL) {
+        do {
+            let data = try emojiArt.json()
+            try data.write(to: url)
+        } catch let error {
+            print("EmojiArtDocument: error while saving \(error.localizedDescription)")
+        }
+    }
+    
+    init() {
+        if let data = try? Data(contentsOf: autoSaveURL),
+           let autosavedEmojiArt = try? EmojiArt(json: data) {
+            emojiArt = autosavedEmojiArt
+        }
     }
     
     var emojis: [Emoji] {

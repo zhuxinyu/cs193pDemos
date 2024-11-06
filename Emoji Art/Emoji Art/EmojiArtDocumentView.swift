@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct EmojiArtDocumentView: View {
+    @Environment(\.undoManager) var undoManager
+    
+    @StateObject var paletteStore = PaletteStore(named: "Shared")
+    
     typealias Emoji = EmojiArt.Emoji
+    
     @ObservedObject var document: EmojiArtDocument
     
-    private let paletteEmojiSize:CGFloat = 40
+    @ScaledMetric var paletteEmojiSize: CGFloat = 40
+
     var body: some View {
         VStack(spacing: 0) {
             documentBody
@@ -20,30 +26,10 @@ struct EmojiArtDocumentView: View {
                 .padding(.horizontal)
                 .scrollIndicators(.hidden)
         }
-    }
-    
-    @State private var zoom: CGFloat = 1.0
-    @State private var pan: CGOffset = .zero
-    @GestureState private var gestureZoom: CGFloat = 1.0
-    @GestureState private var gesturePan: CGOffset = .zero
-    
-    private var zoomGestuer: some Gesture {
-        MagnifyGesture()
-            .updating($gestureZoom) { value, gestureState, transaction in
-                gestureState = value.magnification
-            }.onEnded { value in
-                zoom *= value.magnification
-            }
-    }
-    
-    private var panGesture: some Gesture {
-        DragGesture()
-            .updating($gesturePan, body: { value, gestureState, transaction in
-                gestureState = value.translation
-            })
-            .onEnded { value in
-                pan += value.translation
-            }
+        .environmentObject(paletteStore)
+        .toolbar {
+            UndoButton()
+        }
     }
     
     private var documentBody: some View {
@@ -57,30 +43,33 @@ struct EmojiArtDocumentView: View {
                         .position(Emoji.Position.zero.in(geometry))
                 }
                 documentContents(in: geometry)
+                    .scaleEffect(zoom * gestureZoom)
                     .offset(pan + gesturePan)
-                    .scaleEffect(zoom * gestureZoom )
             }
-            .gesture(panGesture.simultaneously(with: zoomGestuer))
+            .gesture(panGesture.simultaneously(with: zoomGesture))
             .onTapGesture(count: 2) {
                 zoomToFit(document.bbox, in: geometry)
             }
             .dropDestination(for: Sturldata.self) { sturldatas, location in
                 return drop(sturldatas, at: location, in: geometry)
             }
-            .onChange(of: document.background.failureReason) { _, reason in
-                showBackgroundFailureAlert = true
+            .onChange(of: document.background.failureReason) { reason in
+                showBackgroundFailureAlert = (reason != nil)
             }
-            .onChange(of: document.background.uiImage, { _, uiimage in
-                zoomToFit(uiimage?.size, in: geometry)
-            })
-            .alert("Set Background",
-                   isPresented: $showBackgroundFailureAlert,
-                   presenting: document.background.failureReason, 
-                   actions: { reason in
-                     Button("OK", role: .cancel) {}
-                   }, message: { reason in
-                      Text(reason)
-                   })
+            .onChange(of: document.background.uiImage) { uiImage in
+                zoomToFit(uiImage?.size, in: geometry)
+            }
+            .alert(
+                "Set Background",
+                isPresented: $showBackgroundFailureAlert,
+                presenting: document.background.failureReason,
+                actions: { reason in
+                    Button("OK", role: .cancel) { }
+                },
+                message: { reason in
+                    Text(reason)
+                }
+            )
         }
     }
     
@@ -106,34 +95,62 @@ struct EmojiArtDocumentView: View {
     }
     
     @State private var showBackgroundFailureAlert = false
-    
+        
     @ViewBuilder
     private func documentContents(in geometry: GeometryProxy) -> some View {
-        if let uiimage = document.background.uiImage {
-            Image(uiImage: uiimage)
+        if let uiImage = document.background.uiImage {
+            Image(uiImage: uiImage)
                 .position(Emoji.Position.zero.in(geometry))
         }
         ForEach(document.emojis) { emoji in
             Text(emoji.string)
                 .font(emoji.font)
                 .position(emoji.position.in(geometry))
-            
         }
+    }
+
+    @State private var zoom: CGFloat = 1
+    @State private var pan: CGOffset = .zero
+    
+    @GestureState private var gestureZoom: CGFloat = 1
+    @GestureState private var gesturePan: CGOffset = .zero
+    
+    private var zoomGesture: some Gesture {
+        MagnificationGesture()
+            .updating($gestureZoom) { inMotionPinchScale, gestureZoom, _ in
+                gestureZoom = inMotionPinchScale
+            }
+            .onEnded { endingPinchScale in
+                zoom *= endingPinchScale
+            }
+    }
+    
+    private var panGesture: some Gesture {
+        DragGesture()
+            .updating($gesturePan) { inMotionDragGestureValue, gesturePan, _ in
+                gesturePan = inMotionDragGestureValue.translation
+            }
+            .onEnded { endingDragGestureValue in
+                pan += endingDragGestureValue.translation
+            }
     }
     
     private func drop(_ sturldatas: [Sturldata], at location: CGPoint, in geometry: GeometryProxy) -> Bool {
         for sturldata in sturldatas {
             switch sturldata {
             case .url(let url):
-                document.setBackground(url)
+                document.setBackground(url, undoWith: undoManager)
                 return true
             case .string(let emoji):
                 document.addEmoji(
                     emoji,
                     at: emojiPosition(at: location, in: geometry),
-                    size: paletteEmojiSize / zoom
+                    size: paletteEmojiSize / zoom,
+                    undoWith: undoManager
                 )
-            default: break
+                return true
+            default:
+                break
             }
         }
         return false

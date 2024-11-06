@@ -9,9 +9,10 @@ import SwiftUI
 
 struct PaletteChooser: View {
     @EnvironmentObject var store: PaletteStore
+    
     @State private var showPaletteEditor = false
     @State private var showPaletteList = false
-    
+
     var body: some View {
         HStack {
             chooser
@@ -19,26 +20,24 @@ struct PaletteChooser: View {
         }
         .clipped()
         .sheet(isPresented: $showPaletteEditor) {
-            NavigationStack {
-                PaletteEditor(palette: $store.palettes[store.cursorIndex ])
-                    .font(nil)
-            }
+            PaletteEditor(palette: $store.palettes[store.cursorIndex])
+                .font(nil)
         }
-        .sheet(isPresented: $showPaletteList, content: {
+        .sheet(isPresented: $showPaletteList) {
             NavigationStack {
                 EditablePaletteList(store: store)
                     .font(nil)
             }
-        })
+        }
     }
     
-    var chooser: some View {
+    private var chooser: some View {
         AnimatedActionButton(systemImage: "paintpalette") {
             store.cursorIndex += 1
         }
-        .contextMenu{
+        .contextMenu {
             gotoMenu
-            AnimatedActionButton("new", systemImage: "plus") {
+            AnimatedActionButton("New", systemImage: "plus") {
                 store.insert(name: "", emojis: "")
                 showPaletteEditor = true
             }
@@ -68,7 +67,7 @@ struct PaletteChooser: View {
         }
     }
     
-    func view(for palette: Palette) -> some View {
+    private func view(for palette: Palette) -> some View {
         HStack {
             Text(palette.name)
             ScrollingEmojis(palette.emojis)
@@ -79,7 +78,7 @@ struct PaletteChooser: View {
 }
 
 struct ScrollingEmojis: View {
-    let emojis:[String]
+    let emojis: [String]
     
     init(_ emojis: String) {
         self.emojis = emojis.uniqued.map(String.init)
